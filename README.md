@@ -17,3 +17,6 @@ vagrant のhost側で
 $ vagrant up
 $ vagrant ssh
 ```
+
+
+1.0.0 新規
