@@ -1,0 +1,5 @@
+mecab-python3==0.7
+requests==2.20.1
+pandas==0.23.4
+sklearn
+python-crfsuite==0.9.6
