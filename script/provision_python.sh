@@ -1,6 +1,5 @@
 #!/bin/bash
 
-sudo apt install -y build-essential
 
 # https://pip.pypa.io/en/latest/installing/
 curl https://bootstrap.pypa.io/get-pip.py -O

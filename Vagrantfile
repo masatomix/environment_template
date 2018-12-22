@@ -79,14 +79,15 @@ Vagrant.configure("2") do |config|
   config.vm.provision :shell, :path => "./script/provision_python.sh",:privileged => false
 
   # さらにMeCabなどを使いたいヒト向け
-  #config.vm.provision :shell, :path => "./script/provision_mecab.sh",:privileged => false
-  #config.vm.provision :shell, :path => "./script/provision_python_nlp.sh",:privileged => false
+  config.vm.provision :shell, :path => "./script/provision_mecab.sh",:privileged => false
+  config.vm.provision :shell, :path => "./script/provision_python_nlp.sh",:privileged => false
 
   # Nodejsを使いたいヒト向け
-  #config.vm.provision :shell, :path => "./script/provision_nodejs.sh",:privileged => false
+  config.vm.provision :shell, :path => "./script/provision_nodejs.sh",:privileged => false
 
   # Dockerを使いたいヒト向け
-  #config.vm.provision :shell, :path => "./script/provision_docker.sh",:privileged   => false
+  config.vm.provision :shell, :path => "./script/provision_docker.sh",:privileged   => false
+
   ## config.vm.provision :shell, :path => "./script/provision_docker_Laravel.sh",:privileged   => false
 
 end
