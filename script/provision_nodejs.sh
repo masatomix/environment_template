@@ -9,3 +9,7 @@ git clone https://github.com/riywo/node-build.git $(ndenv root)/plugins/node-bui
 ndenv install v10.14.2
 ndenv rehash
 ndenv global v10.14.2
+
+# https://github.com/angular/angular-cli/issues/7735
+# echo -e 'export PATH=$(npm prefix -g)/bin:$PATH' >> ~/.bash_profile
+# source  ~/.bash_profile
