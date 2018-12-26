@@ -1,0 +1,61 @@
+version: '2'
+services:
+
+  mysql-server:
+    image: mysql:5.7
+    command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    environment:
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=zabbix
+      - MYSQL_ROOT_PASSWORD=zabbix
+    restart: always
+
+  zabbix-java-gateway:
+    image: zabbix/zabbix-java-gateway:latest
+    restart: always
+
+  zabbix-server-mysql:
+    image: zabbix/zabbix-server-mysql:latest
+    depends_on:
+      - mysql-server
+      - zabbix-java-gateway
+    environment:
+      - DB_SERVER_HOST=mysql-server
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=zabbix
+      - MYSQL_ROOT_PASSWORD=zabbix
+    links:
+      - mysql-server:mysql
+      - zabbix-java-gateway:zabbix-java-gateway
+    ports:
+      - 10051:10051
+    restart: always
+
+  zabbix-web-nginx-mysql:
+    build: ./nginx/
+    depends_on:
+      - mysql-server
+      - zabbix-server-mysql
+      - zabbix-java-gateway
+    environment:
+      - DB_SERVER_HOST=mysql-server
+      - MYSQL_DATABASE=zabbix
+      - MYSQL_USER=zabbix
+      - MYSQL_PASSWORD=zabbix
+      - MYSQL_ROOT_PASSWORD=zabbix
+      - ZBX_SERVER_HOST=zabbix-server
+      - PHP_TZ="Asia/Tokyo"
+    links:
+      - mysql-server:mysql
+      - zabbix-server-mysql:zabbix-server
+    ports:
+      - 80:80
+    restart: always
+
+  zabbix-agent:
+    image: zabbix/zabbix-agent:latest
+    links:
+      - zabbix-server-mysql:zabbix-server
+    restart: always
