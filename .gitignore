@@ -138,3 +138,6 @@ dmypy.json
 .venv/
 
 # End of https://www.gitignore.io/api/python
+
+mysql/db/
+

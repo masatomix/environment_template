@@ -7,4 +7,5 @@ source  ~/.bash_profile
 git clone https://github.com/riywo/node-build.git $(ndenv root)/plugins/node-build
 
 ndenv install v10.14.2
+ndenv rehash
 ndenv global v10.14.2

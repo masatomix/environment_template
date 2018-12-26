@@ -84,8 +84,11 @@ Vagrant.configure("2") do |config|
 
   # Nodejsを使いたいヒト向け
   config.vm.provision :shell, :path => "./script/provision_nodejs.sh",:privileged => false
+  # Rubyを使いたいヒト向け
+  config.vm.provision :shell, :path => "./script/provision_ruby.sh",:privileged   => false
 
   # Dockerを使いたいヒト向け
   config.vm.provision :shell, :path => "./script/provision_docker.sh",:privileged   => false
   # config.vm.provision :shell, :path => "./script/provision_docker_zabbix.sh",:privileged   => false
+  # config.vm.provision :shell, :path => "./script/provision_docker_mysql.sh",:privileged   => false
 end
