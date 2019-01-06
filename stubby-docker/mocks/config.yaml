@@ -1,0 +1,22 @@
+-
+  request:
+    url: ^/ajax/get001/$
+    method: GET
+  response:
+    -
+      status: 200
+      headers:
+        content-type: application/json
+      file: get001.json
+
+
+-
+  request:
+    url: ^/ajax/get002/$
+    method: GET
+  response:
+    -
+      status: 200
+      headers:
+        content-type: application/json
+      file: get002.json
