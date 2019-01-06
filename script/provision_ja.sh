@@ -14,4 +14,4 @@ echo export LC_CTYPE=ja_JP.UTF-8 >> ~/.bash_profile
 source ~/.bash_profile
 
 
-sudo apt install -y build-essential
+sudo apt install -y build-essential nmap jq
