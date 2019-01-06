@@ -1,0 +1,8 @@
+version: '2'
+services:
+  my-stubby:
+    build: ./
+    ports:
+      - 8882:8882
+    volumes:
+      - ./mocks:/home/stubby/mocks
