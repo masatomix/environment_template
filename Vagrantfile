@@ -37,7 +37,7 @@ Vagrant.configure("2") do |config|
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
   # your network.
-  # config.vm.network "public_network"
+  config.vm.network "public_network"
 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
@@ -79,15 +79,19 @@ Vagrant.configure("2") do |config|
   config.vm.provision :shell, :path => "./script/provision_python.sh",:privileged => false
 
   # さらにMeCabなどを使いたいヒト向け
-  config.vm.provision :shell, :path => "./script/provision_mecab.sh",:privileged => false
-  config.vm.provision :shell, :path => "./script/provision_python_nlp.sh",:privileged => false
+  # config.vm.provision :shell, :path => "./script/provision_mecab.sh",:privileged => false
+  # config.vm.provision :shell, :path => "./script/provision_python_nlp.sh",:privileged => false
 
   # Nodejsを使いたいヒト向け
   config.vm.provision :shell, :path => "./script/provision_nodejs.sh",:privileged => false
 
+  # Rubyを使いたいヒト向け
+  config.vm.provision :shell, :path => "./script/provision_ruby.sh",:privileged   => false
+
   # Dockerを使いたいヒト向け
   config.vm.provision :shell, :path => "./script/provision_docker.sh",:privileged   => false
-
-  ## config.vm.provision :shell, :path => "./script/provision_docker_Laravel.sh",:privileged   => false
-
+  # config.vm.provision :shell, :path => "./script/provision_docker_zabbix.sh",:privileged   => false
+  # config.vm.provision :shell, :path => "./script/provision_docker_mysql.sh",:privileged   => false
+  # config.vm.provision :shell, :path => "./script/provision_docker_requestbin.sh",:privileged   => false
+  # config.vm.provision :shell, :path => "./script/provision_docker_stubby.sh",:privileged   => false
 end

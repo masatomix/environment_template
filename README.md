@@ -3,9 +3,10 @@
 Vagrant上で、Ubuntu 16.04 LTS を起動するテンプレ。provisionで
 
 - 日本語環境のインストール
-- Pythonのインストール
+- Python(pyenv上)のインストール
 - MeCab等のインストール
-- Nodejsのインストール
+- Nodejs(ndenv上)のインストール
+- Ruby(rbenv上)のインストール
 - Dockerのインストール
 
 などを行います。
@@ -20,3 +21,4 @@ $ vagrant ssh
 
 
 1.0.0 新規
+1.0.1 docker-compose 関連追加、Rubyの追加、Docker上にMySQL,Stubby,Requestbin,などを追加。
