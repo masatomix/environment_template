@@ -24,3 +24,4 @@ $ vagrant ssh
 
 - 1.0.0 新規
 - 1.0.1 docker-compose 関連追加、Rubyの追加、Docker上にMySQL,Stubby,Requestbin,などを追加。
+- 1.0.2 python追加時、libbz2-dev もインストール

@@ -6,6 +6,7 @@ curl https://bootstrap.pypa.io/get-pip.py -O
 sudo python3 get-pip.py
 # sudo apt install -y python3-pip
 
+sudo apt install -y libbz2-dev
 sudo apt install -y python3-dev python3-venv
 sudo apt install -y zlib1g-dev libffi-dev libssl-dev
 sudo apt install -y python-tk tk-dev
