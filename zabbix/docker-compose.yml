@@ -1,31 +1,42 @@
-version: '2'
+version: '3.5'
 services:
 
   mysql-server:
     image: mysql:5.7
     command: ['--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
     environment:
-      - MYSQL_DATABASE=zabbix
-      - MYSQL_USER=zabbix
-      - MYSQL_PASSWORD=zabbix
-      - MYSQL_ROOT_PASSWORD=zabbix
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro 
+      - ./db/mysql_data:/var/lib/mysql
+    user: "1000:50"
     restart: always
 
   zabbix-java-gateway:
-    image: zabbix/zabbix-java-gateway:latest
+    image: zabbix/zabbix-java-gateway:${VERSION}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro 
     restart: always
 
   zabbix-server-mysql:
-    image: zabbix/zabbix-server-mysql:latest
+    image: zabbix/zabbix-server-mysql:${VERSION}
     depends_on:
       - mysql-server
       - zabbix-java-gateway
     environment:
       - DB_SERVER_HOST=mysql-server
-      - MYSQL_DATABASE=zabbix
-      - MYSQL_USER=zabbix
-      - MYSQL_PASSWORD=zabbix
-      - MYSQL_ROOT_PASSWORD=zabbix
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro 
     links:
       - mysql-server:mysql
       - zabbix-java-gateway:zabbix-java-gateway
@@ -41,12 +52,15 @@ services:
       - zabbix-java-gateway
     environment:
       - DB_SERVER_HOST=mysql-server
-      - MYSQL_DATABASE=zabbix
-      - MYSQL_USER=zabbix
-      - MYSQL_PASSWORD=zabbix
-      - MYSQL_ROOT_PASSWORD=zabbix
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
       - ZBX_SERVER_HOST=zabbix-server
       - PHP_TZ="Asia/Tokyo"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro 
     links:
       - mysql-server:mysql
       - zabbix-server-mysql:zabbix-server
@@ -55,7 +69,31 @@ services:
     restart: always
 
   zabbix-agent:
-    image: zabbix/zabbix-agent:latest
+    image: zabbix/zabbix-agent:${VERSION}
     links:
       - zabbix-server-mysql:zabbix-server
+    # networks:
+    #   zbx_net_backend:
+    #   zbx_net_frontend:
     restart: always
+
+
+
+networks:
+  zbx_net_frontend:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.238.0/24
+  zbx_net_backend:
+    driver: bridge
+    driver_opts:
+      com.docker.network.enable_ipv6: "false"
+    internal: true
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.239.0/24
