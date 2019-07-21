@@ -34,7 +34,9 @@
 
 ## おまけ。バックアップ
 
+```
 vagrant@ubuntu-xenial:~$ cd /vagrant/zabbix/
+```
 
 ### 「MySQL以外のプロセス」の停止
 
@@ -67,12 +69,14 @@ zabbix_zabbix-web-nginx-mysql_1_432a2d375844   docker-entrypoint.sh             
 vagrant@ubuntu-xenial:/vagrant/zabbix$ sudo docker ps
 CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                 NAMES
 d44071b826a6        mysql:5.7           "docker-entrypoint.s…"   16 minutes ago      Up 16 minutes       3306/tcp, 33060/tcp   zabbix_mysql-server_1_bbe6d5af81da
+
 ```
 
 以下「MySQL以外のプロセス」の停止、といったらこの作業を指す。
 
 
 ### バックアップ
+
 
 ```
 vagrant@ubuntu-xenial:/vagrant/zabbix$ sudo docker-compose exec mysql-server /bin/bash
@@ -93,11 +97,12 @@ drwxr-xr-x 1 vagrant vagrant      96  7月 22 00:07 db
 -rw-r--r-- 1 vagrant vagrant    2091  7月 22 00:07 docker-compose.yml
 -rw-r--r-- 1 vagrant vagrant 2796867  7月 22 00:35 db20190722.dump
 vagrant@ubuntu-xenial:/vagrant/zabbix$
-
+```
 
 
 ### 起動
 
+```
 vagrant@ubuntu-xenial:/vagrant/zabbix$ sudo docker-compose start zabbix-agent zabbix-java-gateway zabbix-server-mysql zabbix-web-nginx-mysql
 Starting zabbix-java-gateway    ... done
 Starting zabbix-server-mysql    ... done
@@ -113,6 +118,7 @@ zabbix_zabbix-java-gateway_1_92505d90c8f9      docker-entrypoint.sh             
 zabbix_zabbix-server-mysql_1_e37acaaa644d      /sbin/tini -- docker-entry ...   Up      0.0.0.0:10051->10051/tcp
 zabbix_zabbix-web-nginx-mysql_1_432a2d375844   docker-entrypoint.sh             Up      443/tcp, 0.0.0.0:80->80/tcp
 vagrant@ubuntu-xenial:/vagrant/zabbix$
+```
 
 以後起動と行ったらこの作業を指す
 
