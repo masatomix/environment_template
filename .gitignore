@@ -140,4 +140,5 @@ dmypy.json
 # End of https://www.gitignore.io/api/python
 
 mysql/db/
-
+zabbix/db/mysql_data/*
+!.gitkeep
