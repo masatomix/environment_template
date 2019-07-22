@@ -11,16 +11,14 @@ services:
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro 
       - ./db/mysql_data:/var/lib/mysql
-    user: "1000:50"
+    user: "1000:50" # remove at Photon
     restart: always
 
   zabbix-java-gateway:
     image: zabbix/zabbix-java-gateway:${VERSION}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro 
     restart: always
 
   zabbix-server-mysql:
@@ -36,10 +34,6 @@ services:
       - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro 
-    links:
-      - mysql-server:mysql
-      - zabbix-java-gateway:zabbix-java-gateway
     ports:
       - 10051:10051
     restart: always
@@ -60,9 +54,7 @@ services:
       - PHP_TZ="Asia/Tokyo"
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro 
     links:
-      - mysql-server:mysql
       - zabbix-server-mysql:zabbix-server
     ports:
       - 80:80
@@ -72,6 +64,8 @@ services:
     image: zabbix/zabbix-agent:${VERSION}
     links:
       - zabbix-server-mysql:zabbix-server
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
     # networks:
     #   zbx_net_backend:
     #   zbx_net_frontend:
