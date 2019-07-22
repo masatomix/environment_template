@@ -1,10 +1,11 @@
-# environment_template
+# Vagrant環境のDockerで、Zabbixサーバとエージェントを構築する
 
 
 ![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/73777/64f06630-f008-e840-32d8-9c905ff2c83a.png)
 
 
-## Zabbixサーバの構築
+## やってみる
+### Zabbixサーバの構築
 
 ```
  # git clone https://github.com/masatomix/environment_template.git
@@ -15,8 +16,7 @@
 
 と実行することで、Ubuntu Linuxの構築から Docker のインストール、Dockerサーバ上でのZabbixのインストール、そのクライアントでのZabbix Agentのインストールと設定と起動、までが行われます。
 
-
-## Zabbix Agentの構築
+### Zabbix Agentの構築
 
 ```
  # git clone https://github.com/masatomix/environment_template.git
@@ -26,19 +26,21 @@
  # vagrant up
 ```
 
-
 と実行することで、Ubuntu Linuxの構築から Zabbix Agentのインストールと設定と起動、までが行われます。
 
 
 
+## おまけ。データのバックアップ
 
-## おまけ。バックアップ
+ログイン後、
 
 ```
 vagrant@ubuntu-xenial:~$ cd /vagrant/zabbix/
 ```
 
-### 「MySQL以外のプロセス」の停止
+に移動
+
+### MySQL以外のプロセスの停止
 
 ```
 vagrant@ubuntu-xenial:/vagrant/zabbix$ sudo docker-compose ps
@@ -72,11 +74,10 @@ d44071b826a6        mysql:5.7           "docker-entrypoint.s…"   16 minutes ag
 
 ```
 
-以下「MySQL以外のプロセス」の停止、といったらこの作業を指す。
+以後「MySQL以外のプロセスの停止」といったらこの作業を指すこととしましょう。
 
 
-### バックアップ
-
+### データのバックアップ
 
 ```
 vagrant@ubuntu-xenial:/vagrant/zabbix$ sudo docker-compose exec mysql-server /bin/bash
@@ -87,6 +88,9 @@ mysqldump: [Warning] Using a password on the command line interface can be insec
 I have no name!@d44071b826a6:/$ exit
 exit
 ```
+
+コンテナ内の``/tmp``にバックアップデータが出力されました。
+
 
 ```
 vagrant@ubuntu-xenial:/vagrant/zabbix$ sudo docker cp d44071b826a6:/tmp/db20190722.dump ./
@@ -99,8 +103,10 @@ drwxr-xr-x 1 vagrant vagrant      96  7月 22 00:07 db
 vagrant@ubuntu-xenial:/vagrant/zabbix$
 ```
 
+コンテナからの取り出しが完了です。
 
-### 起動
+最後に各サーバを起動して、バックアップは完了です。
+
 
 ```
 vagrant@ubuntu-xenial:/vagrant/zabbix$ sudo docker-compose start zabbix-agent zabbix-java-gateway zabbix-server-mysql zabbix-web-nginx-mysql
@@ -120,16 +126,19 @@ zabbix_zabbix-web-nginx-mysql_1_432a2d375844   docker-entrypoint.sh             
 vagrant@ubuntu-xenial:/vagrant/zabbix$
 ```
 
-以後起動と行ったらこの作業を指す
 
-## おまけ。リストア
+以後「各サーバを起動」といったらこの作業を指すこととしましょう。
 
-### プロセス確認、停止
 
-「MySQL以外のプロセス」を停止する
+## おまけ。データのリストア
 
+### プロセス停止
+
+「MySQL以外のプロセスの停止」します。
 
 ### リストア準備
+
+さてMySQL以外が停止している状態で、リストアを開始します。手順としてはすでに存在するデータベースを削除して、先のバックアップデータを戻すという流れです。
 
 ```
 vagrant@ubuntu-xenial:/vagrant/zabbix$ sudo docker cp ./db20190722.dump d44071b826a6:/
@@ -141,6 +150,9 @@ total 2800
 -rw-r--r--   1 1000 1000 2796867 Jul 22 00:35 db20190722.dump
 I have no name!@d44071b826a6:/$
 ```
+
+コンテナへデータを転送出来ました。
+
 
 ### 削除・空DB作成・リストア
 
@@ -155,11 +167,11 @@ Query OK, 144 rows affected (1.70 sec)
 mysql> create  database zabbix;
 Query OK, 1 row affected (0.01 sec)
 
-
 mysql> exit
 Bye
 ```
 
+いよいよデータを入れていきます。
 
 ```
 I have no name!@d44071b826a6:/$ mysql -uzabbix -pzabbix zabbix < ./db20190722.dump
@@ -172,6 +184,7 @@ exit
 
 ```
 
+
 ### 起動
 
-プロセスを起動すればOK。
+最後に「各サーバを起動」しましょう。おつかれさまでした！
