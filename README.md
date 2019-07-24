@@ -1,190 +1,81 @@
+
 # Vagrant環境のDockerで、Zabbixサーバとエージェントを構築する
 
+以前自分のWikiに「[Vagrant環境のDockerサーバに、Zabbixのサーバとエージェントを構築する](https://www.masatom.in/pukiwiki/Zabbix/Vagrant%B4%C4%B6%AD%A4%C7%A5%B5%A1%BC%A5%D0%A4%C8%A5%A8%A1%BC%A5%B8%A5%A7%A5%F3%A5%C8%A4%F2%B9%BD%C3%DB%A4%B9%A4%EB/)」って記事を書いたのですが、そのときはVagrantのProvision機能でDockerをチマチマ実行してました。
 
-![image.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/73777/64f06630-f008-e840-32d8-9c905ff2c83a.png)
-
-
-## やってみる
-### Zabbixサーバの構築
-
-```
- # git clone https://github.com/masatomix/environment_template.git
- # cd environment_template/
- # git checkout -t origin/feature/for_qiita_zabbix
- # vagrant up
-```
-
-と実行することで、Ubuntu Linuxの構築から Docker のインストール、Dockerサーバ上でのZabbixのインストール、そのクライアントでのZabbix Agentのインストールと設定と起動、までが行われます。
-
-### Zabbix Agentの構築
-
-```
- # git clone https://github.com/masatomix/environment_template.git
- # cd environment_template/
- # git checkout -t origin/feature/for_qiita_zabbix
- # cd agent
- # vagrant up
-```
-
-と実行することで、Ubuntu Linuxの構築から Zabbix Agentのインストールと設定と起動、までが行われます。
+今回は同じ環境を docker-compose で作成します。
 
 
+## 作成する環境
 
-## おまけ。データのバックアップ
+- 1つのVagrantfileで Zabbixサーバを1つ、別のVagrantfileで、監視されるエージェント側のOSを二つ構築します。
+- ZabbixサーバはUbuntu Linux 上のDocker上に構築します。
+- エージェント側もUbuntu Linuxとします。
+- それぞれの仮想マシンはネットワーク的に到達可能である必要がありますが、Vagrantはデフォルトではおなじネットワークを共有しないようなので[^1]、ウラＬＡＮとして 192.168.33.0/24 のネットワークを構築します。
+- Zabbixサーバは80番ポートでWEBサーバが起動しますが、VagrantはNATかけないとアクセス出来ないので、port forwardingで 8888番ポートアクセスを80番ポートへ転送します。
 
-ログイン後、
+図にするとこんな感じ。
+![Vagrant_Docker_zabbix.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/73777/4c7b4422-482e-0a2a-7fc5-8229e4143c53.png)
+
+
+ちなみに今回作業する環境は下記の通り。
 
 ```
-vagrant@ubuntu-xenial:~$ cd /vagrant/zabbix/
+$ sw_vers
+ProductName:	Mac OS X
+ProductVersion:	10.14.5
+BuildVersion:	18F132
+$
 ```
 
-に移動
+## コードの取得
 
-### MySQL以外のプロセスの停止
+使用するファイル群を[GitHub](https://github.com/masatomix/environment_template/tree/feature/for_qiita_zabbix)から取得します。
 
-```
-vagrant@ubuntu-xenial:/vagrant/zabbix$ sudo docker-compose ps
-                    Name                                  Command               State              Ports
--------------------------------------------------------------------------------------------------------------------
-zabbix_mysql-server_1_bbe6d5af81da             docker-entrypoint.sh --cha ...   Up      3306/tcp, 33060/tcp
-zabbix_zabbix-agent_1_e8a8079c2325             /sbin/tini -- docker-entry ...   Up      10050/tcp
-zabbix_zabbix-java-gateway_1_92505d90c8f9      docker-entrypoint.sh             Up      10052/tcp
-zabbix_zabbix-server-mysql_1_e37acaaa644d      /sbin/tini -- docker-entry ...   Up      0.0.0.0:10051->10051/tcp
-zabbix_zabbix-web-nginx-mysql_1_432a2d375844   docker-entrypoint.sh             Up      443/tcp, 0.0.0.0:80->80/tcp
-
-vagrant@ubuntu-xenial:/vagrant/zabbix$ sudo docker-compose stop zabbix-agent zabbix-java-gateway zabbix-server-mysql zabbix-web-nginx-mysql
-Stopping zabbix_zabbix-web-nginx-mysql_1_432a2d375844 ... done
-Stopping zabbix_zabbix-agent_1_e8a8079c2325           ... done
-Stopping zabbix_zabbix-server-mysql_1_e37acaaa644d    ... done
-Stopping zabbix_zabbix-java-gateway_1_92505d90c8f9    ... done
-
-vagrant@ubuntu-xenial:/vagrant/zabbix$ sudo docker-compose ps
-                    Name                                  Command                State            Ports
---------------------------------------------------------------------------------------------------------------
-zabbix_mysql-server_1_bbe6d5af81da             docker-entrypoint.sh --cha ...   Up         3306/tcp, 33060/tcp
-zabbix_zabbix-agent_1_e8a8079c2325             /sbin/tini -- docker-entry ...   Exit 0
-zabbix_zabbix-java-gateway_1_92505d90c8f9      docker-entrypoint.sh             Exit 143
-zabbix_zabbix-server-mysql_1_e37acaaa644d      /sbin/tini -- docker-entry ...   Exit 0
-zabbix_zabbix-web-nginx-mysql_1_432a2d375844   docker-entrypoint.sh             Exit 0
-
-
-vagrant@ubuntu-xenial:/vagrant/zabbix$ sudo docker ps
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                 NAMES
-d44071b826a6        mysql:5.7           "docker-entrypoint.s…"   16 minutes ago      Up 16 minutes       3306/tcp, 33060/tcp   zabbix_mysql-server_1_bbe6d5af81da
-
+```bash
+$ git clone https://github.com/masatomix/environment_template.git
+$ cd environment_template/
+$ git checkout -t origin/feature/for_qiita_zabbix
 ```
 
-以後「MySQL以外のプロセスの停止」といったらこの作業を指すこととしましょう。
+## Zabbixサーバの構築
 
+## Zabbixサーバの構築
 
-### データのバックアップ
+サーバの構築はVagrantで一発です。
 
-```
-vagrant@ubuntu-xenial:/vagrant/zabbix$ sudo docker-compose exec mysql-server /bin/bash
-
-I have no name!@d44071b826a6:/$ mysqldump --single-transaction -uzabbix -pzabbix zabbix > /tmp/db20190722.dump
-mysqldump: [Warning] Using a password on the command line interface can be insecure.
-
-I have no name!@d44071b826a6:/$ exit
-exit
+```bash
+$ vagrant up
 ```
 
-コンテナ内の``/tmp``にバックアップデータが出力されました。
+と実行することで、Ubuntu Linuxの構築から Dockerのインストール、Dockerサーバ上でのZabbixサーバのインストール、そのサーバ自体を監視するためのZabbixエージェントのコンテナのインストール、と設定と起動、までが行われます。
+
+Vagrantが動いてるOS上のブラウザから``http://127.0.0.1:8888/`` へアクセスして、Zabbixサーバのログイン画面が表示されればOKです。admin/zabbix で入れることを確認しておきましょう。
+![top.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/73777/17fcc973-c48c-2d56-513a-dd5fa6a35119.png)
 
 
-```
-vagrant@ubuntu-xenial:/vagrant/zabbix$ sudo docker cp d44071b826a6:/tmp/db20190722.dump ./
-vagrant@ubuntu-xenial:/vagrant/zabbix$ ls -lrt
-合計 2736
-drwxr-xr-x 1 vagrant vagrant      96  7月 22 00:07 nginx
-drwxr-xr-x 1 vagrant vagrant      96  7月 22 00:07 db
--rw-r--r-- 1 vagrant vagrant    2091  7月 22 00:07 docker-compose.yml
--rw-r--r-- 1 vagrant vagrant 2796867  7月 22 00:35 db20190722.dump
-vagrant@ubuntu-xenial:/vagrant/zabbix$
-```
+## Zabbixエージェントの構築
 
-コンテナからの取り出しが完了です。
+つづいてエージェント側。
 
-最後に各サーバを起動して、バックアップは完了です。
-
-
-```
-vagrant@ubuntu-xenial:/vagrant/zabbix$ sudo docker-compose start zabbix-agent zabbix-java-gateway zabbix-server-mysql zabbix-web-nginx-mysql
-Starting zabbix-java-gateway    ... done
-Starting zabbix-server-mysql    ... done
-Starting zabbix-web-nginx-mysql ... done
-Starting zabbix-agent           ... done
-
-vagrant@ubuntu-xenial:/vagrant/zabbix$ sudo docker-compose ps
-                    Name                                  Command               State              Ports
--------------------------------------------------------------------------------------------------------------------
-zabbix_mysql-server_1_bbe6d5af81da             docker-entrypoint.sh --cha ...   Up      3306/tcp, 33060/tcp
-zabbix_zabbix-agent_1_e8a8079c2325             /sbin/tini -- docker-entry ...   Up      10050/tcp
-zabbix_zabbix-java-gateway_1_92505d90c8f9      docker-entrypoint.sh             Up      10052/tcp
-zabbix_zabbix-server-mysql_1_e37acaaa644d      /sbin/tini -- docker-entry ...   Up      0.0.0.0:10051->10051/tcp
-zabbix_zabbix-web-nginx-mysql_1_432a2d375844   docker-entrypoint.sh             Up      443/tcp, 0.0.0.0:80->80/tcp
-vagrant@ubuntu-xenial:/vagrant/zabbix$
+```bash
+$ cd agent
+$ vagrant up
 ```
 
+と実行することで、Ubuntu Linuxの構築から Zabbixエージェントのインストールと設定と起動、までが行われます。
 
-以後「各サーバを起動」といったらこの作業を指すこととしましょう。
+``vagrant up`` が完了したらOSが二つ立ち上がっているはずので、ログイン出来ることを確認しておきましょう。
 
-
-## おまけ。データのリストア
-
-### プロセス停止
-
-「MySQL以外のプロセスの停止」します。
-
-### リストア準備
-
-さてMySQL以外が停止している状態で、リストアを開始します。手順としてはすでに存在するデータベースを削除して、先のバックアップデータを戻すという流れです。
-
-```
-vagrant@ubuntu-xenial:/vagrant/zabbix$ sudo docker cp ./db20190722.dump d44071b826a6:/
-vagrant@ubuntu-xenial:/vagrant/zabbix$ sudo docker-compose exec mysql-server /bin/bash
-
-I have no name!@d44071b826a6:/$ ls -lrt
-total 2800
+```bash
+$ vagrant ssh agent001 (agent002)
+Welcome to Ubuntu 16.04.5 LTS (GNU/Linux 4.4.0-139-generic x86_64)
 ...
--rw-r--r--   1 1000 1000 2796867 Jul 22 00:35 db20190722.dump
-I have no name!@d44071b826a6:/$
+vagrant@agent001:~$
 ```
 
-コンテナへデータを転送出来ました。
+つづきは [Vagrant環境のDockerで、Zabbixサーバとエージェントを構築する](https://qiita.com/masatomix/items/8ad9d45399ef01d73d4c) に記事にしました。
 
 
-### 削除・空DB作成・リストア
+[^1]: publicにBridgeすりゃイイんですが
 
-```
-I have no name!@d44071b826a6:/$  mysql -uzabbix -pzabbix
-...
-Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
-
-mysql>  drop database zabbix;
-Query OK, 144 rows affected (1.70 sec)
-
-mysql> create  database zabbix;
-Query OK, 1 row affected (0.01 sec)
-
-mysql> exit
-Bye
-```
-
-いよいよデータを入れていきます。
-
-```
-I have no name!@d44071b826a6:/$ mysql -uzabbix -pzabbix zabbix < ./db20190722.dump
-mysql: [Warning] Using a password on the command line interface can be insecure.
-I have no name!@d44071b826a6:/$
-
-
-I have no name!@d44071b826a6:/$ exit
-exit
-
-```
-
-
-### 起動
-
-最後に「各サーバを起動」しましょう。おつかれさまでした！
