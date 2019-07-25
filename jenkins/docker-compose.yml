@@ -12,3 +12,15 @@ services:
     volumes:
       - ./jenkins_home:/var/jenkins_home
     restart: always
+
+  jenkins-slave01:
+    build: ./slaves/
+    volumes:
+      - ./jenkins-slave01/:/jenkins/workspace
+    restart: always
+
+  jenkins-slave02:
+    build: ./slaves/
+    volumes:
+      - ./jenkins-slave02/:/jenkins/workspace
+    restart: always
