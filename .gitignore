@@ -142,3 +142,7 @@ dmypy.json
 mysql/db/
 zabbix/db/mysql_data/*
 !.gitkeep
+
+jenkins/jenkins_home*/*
+!.gitkeep
+

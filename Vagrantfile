@@ -90,6 +90,7 @@ Vagrant.configure("2") do |config|
 
   # Dockerを使いたいヒト向け
   config.vm.provision :shell, :path => "./script/provision_docker.sh",:privileged   => false
+  # config.vm.provision :shell, :path => "./script/provision_docker_jenkins.sh",:privileged   => false
   # config.vm.provision :shell, :path => "./script/provision_docker_zabbix.sh",:privileged   => false
   # config.vm.provision :shell, :path => "./script/provision_docker_mysql.sh",:privileged   => false
   # config.vm.provision :shell, :path => "./script/provision_docker_requestbin.sh",:privileged   => false

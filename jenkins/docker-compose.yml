@@ -1,0 +1,14 @@
+version: '3.5'
+services:
+  jenkins-master:
+    image: jenkins/jenkins:${VERSION}
+    environment:
+      # - JENKINS_OPTS= --prefix=/jenkins --logfile=/var/jenkins_home/jenkins.log
+      - JENKINS_OPTS= --prefix=/jenkins
+      # - JAVA_OPTS=-Duser.timezone=Asia/Tokyo -Dfile.encoding=UTF-8
+    ports:
+      - 8080:8080
+      # - 50000:50000
+    volumes:
+      - ./jenkins_home:/var/jenkins_home
+    restart: always
