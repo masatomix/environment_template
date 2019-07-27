@@ -4,4 +4,4 @@ sudo apt-get update
 sudo apt-get upgrade -y
 
 
-sudo apt install -y nmap jq
+sudo apt install -y nmap jq expect
