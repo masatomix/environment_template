@@ -23,7 +23,8 @@ Vagrant.configure("2") do |config|
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   # NOTE: This will enable public access to the opened port
-  # config.vm.network "forwarded_port", guest: 80, host: 8080
+  config.vm.network "forwarded_port", guest: 8080, host: 8888
+  config.vm.network "forwarded_port", guest: 50000, host: 50000
 
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine and only allow access
@@ -37,7 +38,7 @@ Vagrant.configure("2") do |config|
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
   # your network.
-  config.vm.network "public_network"
+  # config.vm.network "public_network"
 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
@@ -76,20 +77,22 @@ Vagrant.configure("2") do |config|
   config.vm.provision :shell, :path => "./script/provision_ja.sh",:privileged => false
   
   # pythonを使いたいヒト向け
-  config.vm.provision :shell, :path => "./script/provision_python.sh",:privileged => false
+  # config.vm.provision :shell, :path => "./script/provision_python.sh",:privileged => false
 
   # さらにMeCabなどを使いたいヒト向け
   # config.vm.provision :shell, :path => "./script/provision_mecab.sh",:privileged => false
   # config.vm.provision :shell, :path => "./script/provision_python_nlp.sh",:privileged => false
 
   # Nodejsを使いたいヒト向け
-  config.vm.provision :shell, :path => "./script/provision_nodejs.sh",:privileged => false
+  # config.vm.provision :shell, :path => "./script/provision_nodejs.sh",:privileged => false
 
   # Rubyを使いたいヒト向け
-  config.vm.provision :shell, :path => "./script/provision_ruby.sh",:privileged   => false
+  # config.vm.provision :shell, :path => "./script/provision_ruby.sh",:privileged   => false
 
   # Dockerを使いたいヒト向け
   config.vm.provision :shell, :path => "./script/provision_docker.sh",:privileged   => false
+  # config.vm.provision :shell, :path => "./script/provision_docker_jenkins_prep.sh",:privileged   => false
+  config.vm.provision :shell, :path => "./script/provision_docker_jenkins.sh",:privileged   => false
   # config.vm.provision :shell, :path => "./script/provision_docker_zabbix.sh",:privileged   => false
   # config.vm.provision :shell, :path => "./script/provision_docker_mysql.sh",:privileged   => false
   # config.vm.provision :shell, :path => "./script/provision_docker_requestbin.sh",:privileged   => false

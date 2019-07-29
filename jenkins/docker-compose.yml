@@ -1,0 +1,12 @@
+version: '3.5'
+services:
+  jenkins-master:
+    image: jenkins/jenkins:${VERSION}
+    environment:
+      - JENKINS_OPTS= --prefix=/jenkins
+    ports:
+      - 8080:8080
+      - 50000:50000
+    volumes:
+      - ./jenkins_home:/var/jenkins_home
+    restart: always
