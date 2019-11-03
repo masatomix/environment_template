@@ -13,3 +13,8 @@ nodenv update
 nodenv install 12.13.0
 nodenv rehash
 nodenv global 12.13.0
+
+# rootでnodeを使用する場合(暫定？)
+# sudo ln -s /home/vagrant/.nodenv/shims/node /usr/local/bin/
+# sudo ln -s /home/vagrant/.nodenv/shims/npm /usr/local/bin/
+# sudo ln -s /home/vagrant/.nodenv/shims/npx /usr/local/bin/
