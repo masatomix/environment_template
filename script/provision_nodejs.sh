@@ -1,15 +1,20 @@
 #!/bin/bash
 
-git clone https://github.com/riywo/ndenv ~/.ndenv
-echo 'export PATH="$HOME/.ndenv/bin:$PATH"' >> ~/.bash_profile
-echo 'eval "$(ndenv init -)"' >> ~/.bash_profile
-source  ~/.bash_profile
-git clone https://github.com/riywo/node-build.git $(ndenv root)/plugins/node-build
+# https://github.com/nodenv/nodenv
+git clone https://github.com/nodenv/nodenv.git ~/.nodenv
+echo 'export PATH="$HOME/.nodenv/bin:$PATH"' >> ~/.bash_profile
+echo 'eval "$(nodenv init -)"' >> ~/.bash_profile
+source ~/.bash_profile
+mkdir -p "$(nodenv root)"/plugins
+git clone https://github.com/nodenv/node-build.git "$(nodenv root)"/plugins/node-build
+git clone https://github.com/nodenv/nodenv-update.git "$(nodenv root)"/plugins/nodenv-update
+nodenv update
 
-ndenv install v10.14.2
-ndenv rehash
-ndenv global v10.14.2
+nodenv install 12.13.0
+nodenv rehash
+nodenv global 12.13.0
 
-# https://github.com/angular/angular-cli/issues/7735
-# echo -e 'export PATH=$(npm prefix -g)/bin:$PATH' >> ~/.bash_profile
-# source  ~/.bash_profile
+# rootでnodeを使用する場合(暫定？)
+# sudo ln -s /home/vagrant/.nodenv/shims/node /usr/local/bin/
+# sudo ln -s /home/vagrant/.nodenv/shims/npm /usr/local/bin/
+# sudo ln -s /home/vagrant/.nodenv/shims/npx /usr/local/bin/

@@ -94,4 +94,5 @@ Vagrant.configure("2") do |config|
   # config.vm.provision :shell, :path => "./script/provision_docker_mysql.sh",:privileged   => false
   # config.vm.provision :shell, :path => "./script/provision_docker_requestbin.sh",:privileged   => false
   # config.vm.provision :shell, :path => "./script/provision_docker_stubby.sh",:privileged   => false
+  # config.vm.provision :shell, :path => "./script/provision_docker_squid.sh",:privileged   => false
 end
