@@ -22,6 +22,7 @@ $ vagrant ssh
 
 ### 履歴
 
+- 1.0.6 Squidのログ出力を調整
 - 1.0.5 docker-compose で、Squidを構築する docker-compose.yml を追加
 - 1.0.4 docker-compose.yml の微調整 
 - 1.0.3 docker-compose でzabbixを構築する docker-compose.yml を追加

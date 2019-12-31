@@ -1,6 +1,6 @@
 version: '2'
 services:
-  Squid:
+  squid:
     image: sameersbn/squid:3.5.27-2
     ports:
       - "3128:3128"
